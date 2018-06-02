@@ -3,18 +3,18 @@
 #include "queue.h"
 
 void clearQueue (Queue *queue) {
-	queue->first = (Cell*) malloc(sizeof(Cell));
+	queue->first = (qCell*) malloc(sizeof(qCell));
 	queue->last = queue->first;
 	queue->first->next = NULL;
 	queue->size = 0;
 }
 
-int isEmpty (Queue queue) {
+int emptyQueue (Queue queue) {
 	return (queue.size == 0);
 }
 
-void enQueue (Queue *queue, Ticket ticket) {
-	Pointer aux = (Cell*) malloc (sizeof(Cell));
+void enQueue (Queue *queue, Ticket ticket, Time serviceTime) {
+	qPointer aux = (qCell*) malloc (sizeof(qCell));
 	if (aux == NULL) {
 		printf("Memory error");
 		exit(0);
@@ -23,7 +23,8 @@ void enQueue (Queue *queue, Ticket ticket) {
 	queue->last->next = aux;
 	queue->last = queue->last->next;
 	queue->last->ticket = ticket;
-	queue->last->timeInQueue = 1;
+	queue->last->queueTime = 0;
+	queue->last->serviceTime = serviceTime;
 	queue->last->next = NULL;
 
 	if (queue->size == 0) {
@@ -34,10 +35,9 @@ void enQueue (Queue *queue, Ticket ticket) {
 }
 
 Ticket deQueue (Queue *queue) {
-	if (!isEmpty(*queue)) {
-		Pointer aux = queue->first;
+	if (!emptyQueue(*queue)) {
+		qPointer aux = queue->first;
 		Ticket ticket = aux->ticket;
-
 		queue->first = queue->first->next;
 		
 		free (aux);
@@ -51,12 +51,24 @@ Ticket deQueue (Queue *queue) {
 	}
 }
 
-void increaseTime (Queue *queue) {
-	if (!isEmpty(*queue)) {
-		Pointer p = queue->first;
+void increaseQueueTime (Queue *queue) {
+	if (!emptyQueue(*queue)) {
+		qPointer p = queue->first;
 		
 		while (p != NULL) {
-			p->timeInQueue++;
+			p->queueTime++;
+			p = p->next;
+		}
+	} else
+		return;
+}
+
+void increaseServiceTime (Queue *queue) {
+	if (!emptyQueue(*queue)) {
+		qPointer p = queue->first;
+		
+		while (p != NULL) {
+			p->serviceTime++;
 			p = p->next;
 		}
 	} else

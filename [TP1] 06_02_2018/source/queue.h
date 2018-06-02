@@ -1,21 +1,22 @@
 typedef int Time;
 typedef int Ticket;
-typedef struct Cell *Pointer;
-typedef struct Cell {
+typedef struct qCell *qPointer;
+typedef struct qCell {
 	Ticket ticket;
-	Time timeInQueue;
-	Pointer next;
-} Cell;
+	Time queueTime;
+	Time serviceTime;
+	qPointer next;
+} qCell;
 
 typedef struct Queue {
-	Pointer first;
-	Pointer last;
+	qPointer first;
+	qPointer last;
 	int size;
 } Queue;
 
 void clearQueue (Queue *queue);
-int isEmpty (Queue queue);
-void enQueue (Queue *queue, Ticket ticket);
+int emptyQueue (Queue queue);
+void enQueue (Queue *queue, Ticket ticket, Time currentServiceTime);
 Ticket deQueue (Queue *queue);
-void printQueue (Queue queue);
-void increaseTime (Queue *queue);
+void increaseQueueTime (Queue *queue);
+void increaseServiceTime (Queue *queue);
