@@ -69,53 +69,54 @@ void main(int argc, char *argv[]) {
 			if (foodQueue.first->queueTime >= 4) {
 				totalServiceTime += foodQueue.first->serviceTime; //ao finalizar o atendimento o tempo total é incrementado.
 				deQueue(&foodQueue);
-				finished++;//incrementa o contador de clientes com antendimento finalizado
+				finished++; //incrementa o contador de clientes com antendimento finalizado
 			}
 		}
 
-		//caso a fila de bandejas não esteja vazia e a contagem de bandejas na pilha
-		//seja maior que 0, verifica se o tempo na fila da célula cabeça é maior ou igual a 1,
-		//indicando o tempo gasto no processo de chegar na fila e pegar a bandeja.
-		//caso positivo, remove-o o transferindo para a fila de comidas.
-		if (!emptyQueue(trayQueue) && trayStack.size > 0) {
 
-			//essa ação é repetida de acordo com o número de pilhas existentes.
-			//na implementação todas as pilhas são unidas em uma e a remoção de bandejas ocorre desta pilha unica.
-			for (i = 0; i < stacks_number; i++) {
+		//essa ação é repetida de acordo com o número de pilhas existentes.
+		//na implementação todas as pilhas são unidas em uma e a remoção de bandejas ocorre desta pilha unica.
+		//e.g. caso seja definido duas pilhas de 30, é como se duas pessoas pegassem de uma bandeja de 60 na mesma unidade de tempo.
+		for (i = 0; i < stacks_number; i++) {
+			//caso a fila de bandejas não esteja vazia e a contagem de bandejas na pilha
+			//seja maior que 0, verifica se o tempo na fila da célula cabeça é maior ou igual a 1,
+			//indicando o tempo gasto no processo de chegar na fila e pegar a bandeja.
+			//caso positivo, remove-o o transferindo para a fila de comidas.
+			if (!emptyQueue(trayQueue) && trayStack.size > 0) {
 				if (trayQueue.first->queueTime >= 1) {
 					aux = trayQueue.first->serviceTime;
 				 	enQueue(&foodQueue, deQueue(&trayQueue), aux);
 					pop(&trayStack);
 				}
 			}
-
-			//incrementa o tempo em fila das celulas
-			increaseQueueTime(&trayQueue);
 		}
 
-		//caso a fila de fichas não esteja vazia, verifica se o tempo na fila da
-		//célula cabeça é maior ou igual a 1, indicando o tempo gasto no processo de chegar na
-		//fila e ser atendido pelo caixa. caso positivo, remove-o o transferindo para
-		//a fila de bandejas.
-		if (!emptyQueue(ticketQueue)) {
+		//incrementa o tempo em fila das celulas
+		increaseQueueTime(&trayQueue);
 
-			//essa ação é repeitda de acordo com o número de caixas definidos para atendimento.
-			for (i = 0; i < cashiers_number; i++) {
+		//essa ação é repeitda de acordo com o número de caixas definidos para atendimento.
+		//e.g. caso hajam 2 caixas de atendimento, duas pessoas saem da fila na mesma unidade de tempo
+		for (i = 0; i < cashiers_number; i++) {
+			//caso a fila de fichas não esteja vazia, verifica se o tempo na fila da
+			//célula cabeça é maior ou igual a 1, indicando o tempo gasto no processo de chegar na
+			//fila e ser atendido pelo caixa. caso positivo, remove-o o transferindo para a fila de bandejas.
+			if (!emptyQueue(ticketQueue)) {
 				if (ticketQueue.first->queueTime >= 1) {
 					aux = ticketQueue.first->serviceTime;
 				 	enQueue(&trayQueue, deQueue(&ticketQueue), aux);
 				}
 			}
 
-			//incrementa o tempo em fila das celulas
-			increaseQueueTime(&ticketQueue);
 		}
+
+		//incrementa o tempo em fila das celulas
+		increaseQueueTime(&ticketQueue);
 
 		//em todas unidade de tempo, dois novos clientes chegam na fila de fichas
 		enQueue(&ticketQueue, ticket++, 0);
 		enQueue(&ticketQueue, ticket++, 0);
 
-		//a pilha é reabastecida com 10 bandejas de acordo com o tempo definido em refill_time
+		//cada pilha é reabastecida com 10 bandejas de acordo com o tempo definido em refill_time
 		if (time%refill_time == 0) {
 			fillStack(&trayStack, 10 * stacks_number);
 		}
